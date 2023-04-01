@@ -1,17 +1,21 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RoomRepository = void 0;
-const uuid_1 = require("uuid");
-const rooms = [];
-class RoomRepository {
-    createRoom(roomName) {
-        const room = {
-            id: (0, uuid_1.v4)(),
-            name: roomName
-        };
-        rooms.push(room);
-        return room;
+const rooms = [
+    {
+        id: 'a799cfab-55b8-4a4b-a598-58846fdbdbc7',
+        name: 'Room Red'
+    },
+    {
+        id: '4bd14a35-b800-461b-ae28-27ad1b44e06a',
+        name: 'Room Green'
+    },
+    {
+        id: 'ae830e29-d564-4e06-89f7-bb42688db92e',
+        name: 'Room Blue'
     }
+];
+class RoomRepository {
     listRooms() {
         return rooms;
     }

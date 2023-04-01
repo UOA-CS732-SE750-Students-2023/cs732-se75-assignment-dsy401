@@ -13,6 +13,7 @@ export class AuthService {
     public signIn(email: string, password: string) {
         const user = this.userRepository.getByEmailOrThrow(email)
 
+
         if (user.password !== sha256Encrypt(password, user.email)) {
             throw new Error("Password is incorrect")
         }

@@ -1,19 +1,34 @@
 import {Server as SocketServer} from 'socket.io'
 import {TokenService} from "../service/token.service";
 import {RoomRepository} from "../repository/room.repository";
+import {UserRepository} from "../repository/user.repository";
+import {omit} from "lodash";
 
 const tokenService = new TokenService()
 const roomRepository = new RoomRepository()
+const userRepository = new UserRepository()
 
-const getAllOnlineUsers = (io: SocketServer) => {
-    const users = []
+const getAllUsers = (io: SocketServer) => {
+    const users: any[] = []
+    const usersFromDb = userRepository.listAllUsers()
 
-    for (let [id, socket] of io.of('/').sockets) {
+    usersFromDb.forEach(user => {
+        for (let [id, socket] of io.of('/').sockets) {
+            if (user.id === socket.data.userId) {
+                users.push({
+                    socketId: id,
+                    userId: socket.data.userId,
+                    userName: socket.data.userName
+                })
+                return;
+            }
+        }
+
         users.push({
-            socketId: id,
-            userId: socket.data.userId,
+            userId: user.id,
+            userName: user.name
         })
-    }
+    })
 
     return users
 }
@@ -23,38 +38,34 @@ export const registerSockets = (io: SocketServer) => {
     io.use((socket, next) => {
         const token = socket.handshake.auth.token
 
-        // const {user} = tokenService.verify<{user: User}>(token)
+        try {
+            const {userId} = tokenService.verify<{userId: string}>(token)
 
-        // socket.data.userId = user.id
+            const {name} = userRepository.getByIdOrThrow(userId)
 
-        socket.data.userId = '4e6cb539-26d3-4878-ac17-9aba43bb278f'
+            socket.data = {
+                userId,
+                userName: name
+            }
 
-        next()
-
-        // TODO: error handling
+            next()
+        } catch (_) {
+            next(new Error("Token is invalid"))
+        }
     })
 
     io.on('connection', (socket)=> {
-        socket.emit('all-online-users', JSON.stringify(getAllOnlineUsers(io)))
+        console.log(`user ${socket.data.userId} is connected`)
+
+        socket.emit('current-user', JSON.stringify(omit(userRepository.getById(socket.data.userId), ['password'])))
+        io.emit('all-users', JSON.stringify(getAllUsers(io)))
+        io.emit('all-active-rooms', JSON.stringify(roomRepository.listRooms()))
 
 
         socket.on('disconnect', () => {
-            console.log(`socket: ${socket.id} disconnected`)
+            io.emit('all-users', JSON.stringify(getAllUsers(io)))
         })
 
-
-        socket.on('listRooms', () => {
-            const rooms = roomRepository.listRooms()
-            io.emit('listRooms', JSON.stringify(rooms))
-        })
-
-        socket.on('createRoom', (roomName) => {
-            roomRepository.createRoom(roomName)
-
-            const rooms = roomRepository.listRooms()
-
-            io.emit('listRooms', JSON.stringify(rooms))
-        })
 
         socket.on('join-room', (roomId) => {
             if (socket.rooms.has(roomId)){

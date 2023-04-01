@@ -3,40 +3,55 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerSockets = void 0;
 const token_service_1 = require("../service/token.service");
 const room_repository_1 = require("../repository/room.repository");
+const user_repository_1 = require("../repository/user.repository");
+const lodash_1 = require("lodash");
 const tokenService = new token_service_1.TokenService();
 const roomRepository = new room_repository_1.RoomRepository();
-const getAllOnlineUsers = (io) => {
+const userRepository = new user_repository_1.UserRepository();
+const getAllUsers = (io) => {
     const users = [];
-    for (let [id, socket] of io.of('/').sockets) {
+    const usersFromDb = userRepository.listAllUsers();
+    usersFromDb.forEach(user => {
+        for (let [id, socket] of io.of('/').sockets) {
+            if (user.id === socket.data.userId) {
+                users.push({
+                    socketId: id,
+                    userId: socket.data.userId,
+                    userName: socket.data.userName
+                });
+                return;
+            }
+        }
         users.push({
-            socketId: id,
-            userId: socket.data.userId,
+            userId: user.id,
+            userName: user.name
         });
-    }
+    });
     return users;
 };
 const registerSockets = (io) => {
     io.use((socket, next) => {
         const token = socket.handshake.auth.token;
-        // const {user} = tokenService.verify<{user: User}>(token)
-        // socket.data.userId = user.id
-        socket.data.userId = '4e6cb539-26d3-4878-ac17-9aba43bb278f';
-        next();
-        // TODO: error handling
+        try {
+            const { userId } = tokenService.verify(token);
+            const { name } = userRepository.getByIdOrThrow(userId);
+            socket.data = {
+                userId,
+                userName: name
+            };
+            next();
+        }
+        catch (_) {
+            next(new Error("Token is invalid"));
+        }
     });
     io.on('connection', (socket) => {
-        socket.emit('all-online-users', JSON.stringify(getAllOnlineUsers(io)));
+        console.log(`user ${socket.data.userId} is connected`);
+        socket.emit('current-user', JSON.stringify((0, lodash_1.omit)(userRepository.getById(socket.data.userId), ['password'])));
+        io.emit('all-users', JSON.stringify(getAllUsers(io)));
+        io.emit('all-active-rooms', JSON.stringify(roomRepository.listRooms()));
         socket.on('disconnect', () => {
-            console.log(`socket: ${socket.id} disconnected`);
-        });
-        socket.on('listRooms', () => {
-            const rooms = roomRepository.listRooms();
-            io.emit('listRooms', JSON.stringify(rooms));
-        });
-        socket.on('createRoom', (roomName) => {
-            roomRepository.createRoom(roomName);
-            const rooms = roomRepository.listRooms();
-            io.emit('listRooms', JSON.stringify(rooms));
+            io.emit('all-users', JSON.stringify(getAllUsers(io)));
         });
         socket.on('join-room', (roomId) => {
             if (socket.rooms.has(roomId)) {

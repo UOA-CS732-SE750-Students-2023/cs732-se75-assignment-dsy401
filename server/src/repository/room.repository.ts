@@ -1,24 +1,24 @@
-import {v4 as uuid} from 'uuid'
-
 export type Room = {
     id: string
     name: string
 }
 
-const rooms: Room[] = []
+const rooms: Room[] = [
+    {
+        id: 'a799cfab-55b8-4a4b-a598-58846fdbdbc7',
+        name: 'Room Red'
+    },
+    {
+        id: '4bd14a35-b800-461b-ae28-27ad1b44e06a',
+        name: 'Room Green'
+    },
+    {
+        id: 'ae830e29-d564-4e06-89f7-bb42688db92e',
+        name: 'Room Blue'
+    }
+]
 
 export class RoomRepository {
-    public createRoom(roomName: string): Room {
-        const room = {
-            id: uuid(),
-            name: roomName
-        }
-
-        rooms.push(room)
-
-        return room
-    }
-
     public listRooms(): Room[] {
         return rooms
     }

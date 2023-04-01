@@ -1,0 +1,102 @@
+.nav {
+    min-height: 100vh;
+    width: 256px;
+    background: rgb(17, 28, 88);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 32px;
+}
+
+.nav__logo {
+    cursor: pointer;
+}
+
+.nav__section {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 10px;
+    color: #fff;
+}
+
+.nav__item {
+    margin-top: 16px;
+}
+
+.nav__item--title {
+    font-weight: bold;
+    font-size: 14px;
+    color: rgb(139, 155, 241);
+    display: flex;
+    justify-content: space-between;
+}
+
+.nav__add--img {
+    height: 12px;
+}
+
+.nav__add {
+    cursor: pointer;
+    border-radius: 4px;
+    height: 20px;
+    width: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: .2s ease;
+}
+
+.nav__add:hover {
+    background: rgb(32, 44, 110)
+}
+
+.nav__item--room {
+    cursor: pointer;
+    min-height: 32px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0px 9px;
+    margin-top: 4px;
+    transition: .2s ease;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+}
+
+.nav__item--room:hover {
+    background: rgb(32, 44, 110)
+}
+
+.nav__item--room--active {
+    background: rgb(111, 133, 255);
+}
+
+.nav__item--room--active:hover {
+    background: rgb(111, 133, 255);
+}
+
+.room__options--img {
+    height: 16px;
+}
+
+.room__options {
+    height: 21px;
+    align-items: center;
+    justify-content: center;
+    display: none;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.nav__item--room:hover .room__options {
+    display: flex;
+}
+
+.room__options--show {
+    display: flex;
+}
