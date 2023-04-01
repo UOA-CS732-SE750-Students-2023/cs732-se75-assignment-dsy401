@@ -50,17 +50,9 @@ const registerSockets = (io) => {
         socket.emit('current-user', JSON.stringify((0, lodash_1.omit)(userRepository.getById(socket.data.userId), ['password'])));
         io.emit('all-users', JSON.stringify(getAllUsers(io)));
         io.emit('all-active-rooms', JSON.stringify(roomRepository.listRooms()));
+        socket.join(roomRepository.listRooms().map(room => room.id));
         socket.on('disconnect', () => {
             io.emit('all-users', JSON.stringify(getAllUsers(io)));
-        });
-        socket.on('join-room', (roomId) => {
-            if (socket.rooms.has(roomId)) {
-                return;
-            }
-            socket.join(roomId);
-        });
-        socket.on('leave-room', (roomId) => {
-            socket.leave(roomId);
         });
         socket.on('room-message', (payload) => {
             const { roomId, message } = JSON.parse(payload);
