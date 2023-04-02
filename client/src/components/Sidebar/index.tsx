@@ -47,7 +47,7 @@ export const Sidebar = () => {
                 <div style={{ textAlign: 'center' }}>Tech Demo</div>
                 <div style={{ textAlign: 'center' }}>Socket.IO</div>
             </div>
-            <div style={{ marginTop: 10, color: 'white' }}>Hello, {currentUser?.name}</div>
+            <div style={{ marginTop: 10, color: 'white' }}>{currentUser?.name}</div>
             <div className="nav__section">
                 <div className="nav__item">
                     <NavItem path={'/main/dashboard'} active={location.pathname === '/main/dashboard' || location.pathname === '/main'} name={"Dashboard"}/>
