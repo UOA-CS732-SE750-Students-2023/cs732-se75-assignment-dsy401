@@ -7,11 +7,13 @@ const user_repository_1 = require("../repository/user.repository");
 const lodash_1 = require("lodash");
 const dashboard_message_repository_1 = require("../repository/dashboard-message.repository");
 const room_message_repository_1 = require("../repository/room-message.repository");
+const private_message_repository_1 = require("../repository/private-message.repository");
 const tokenService = new token_service_1.TokenService();
 const roomRepository = new room_repository_1.RoomRepository();
 const userRepository = new user_repository_1.UserRepository();
 const dashboardMessageRepository = new dashboard_message_repository_1.DashboardMessageRepository();
 const roomMessageRepository = new room_message_repository_1.RoomMessageRepository();
+const privateMessageRepository = new private_message_repository_1.PrivateMessageRepository();
 const getAllUsers = (io) => {
     const users = [];
     const usersFromDb = userRepository.listAllUsers();
@@ -71,7 +73,13 @@ const registerSockets = (io) => {
                 roomId: roomId
             };
             roomMessageRepository.create(messageToCreate);
-            io.in(roomId).emit('receive-room-message', roomMessageRepository);
+            io.in(roomId).emit('receive-room-message', JSON.stringify(messageToCreate));
+        });
+        socket.on('list-room-messages', (roomId) => {
+            if (!socket.rooms.has(roomId))
+                return;
+            const messages = roomMessageRepository.listMessagesByRoomId(roomId);
+            socket.emit('list-room-messages', JSON.stringify(messages));
         });
         socket.on('send-dashboard-message', (message) => {
             const user = userRepository.getByIdOrThrow(socket.data.userId);
@@ -84,9 +92,32 @@ const registerSockets = (io) => {
             dashboardMessageRepository.create(messageToCreate);
             io.emit('receive-dashboard-message', JSON.stringify(messageToCreate));
         });
-        socket.on('list-dashboard-message', () => {
+        socket.on('list-dashboard-messages', () => {
             const messages = dashboardMessageRepository.listMessages();
             socket.emit('list-dashboard-message', JSON.stringify(messages));
+        });
+        socket.on('send-private-message', (payload) => {
+            var _a;
+            const { socketId, receiverUserId, message } = JSON.parse(payload);
+            const user = userRepository.getByIdOrThrow(socket.data.userId);
+            const messageToCreate = {
+                userId: user.id,
+                name: user.name,
+                message: message,
+                createdAt: Date.now(),
+                receiverUserId: receiverUserId
+            };
+            privateMessageRepository.create(messageToCreate);
+            const allUsers = getAllUsers(io);
+            const isOnlineUser = socketId && !!((_a = allUsers.filter(user => user.socketId && user.socketId === socketId)) === null || _a === void 0 ? void 0 : _a[0]);
+            if (isOnlineUser) {
+                socket.to(socketId).emit('receive-private-message', JSON.stringify(messageToCreate));
+            }
+            socket.emit('receive-private-message', JSON.stringify(messageToCreate));
+        });
+        socket.on('list-private-messages', (receiverUserId) => {
+            const messages = privateMessageRepository.listMessages(socket.data.userId, receiverUserId).concat(privateMessageRepository.listMessages(receiverUserId, socket.data.userId));
+            socket.emit('list-private-messages', JSON.stringify(messages));
         });
     });
 };

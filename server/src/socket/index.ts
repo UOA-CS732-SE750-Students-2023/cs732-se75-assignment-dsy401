@@ -5,12 +5,14 @@ import {UserRepository} from "../repository/user.repository";
 import {omit} from "lodash";
 import {DashboardMessageRepository} from "../repository/dashboard-message.repository";
 import {RoomMessageRepository} from "../repository/room-message.repository";
+import {PrivateMessageRepository} from "../repository/private-message.repository";
 
 const tokenService = new TokenService()
 const roomRepository = new RoomRepository()
 const userRepository = new UserRepository()
 const dashboardMessageRepository = new DashboardMessageRepository()
 const roomMessageRepository = new RoomMessageRepository()
+const privateMessageRepository = new PrivateMessageRepository()
 
 const getAllUsers = (io: SocketServer) => {
     const users: any[] = []
@@ -89,7 +91,15 @@ export const registerSockets = (io: SocketServer) => {
 
             roomMessageRepository.create(messageToCreate)
 
-            io.in(roomId).emit('receive-room-message', roomMessageRepository)
+            io.in(roomId).emit('receive-room-message', JSON.stringify(messageToCreate))
+        })
+
+        socket.on('list-room-messages', (roomId) => {
+            if (!socket.rooms.has(roomId)) return;
+
+            const messages = roomMessageRepository.listMessagesByRoomId(roomId)
+
+            socket.emit('list-room-messages', JSON.stringify(messages))
         })
 
         socket.on('send-dashboard-message', (message) => {
@@ -107,10 +117,41 @@ export const registerSockets = (io: SocketServer) => {
             io.emit('receive-dashboard-message', JSON.stringify(messageToCreate))
         })
 
-        socket.on('list-dashboard-message', () => {
+        socket.on('list-dashboard-messages', () => {
             const messages = dashboardMessageRepository.listMessages()
 
             socket.emit('list-dashboard-message', JSON.stringify(messages))
+        })
+
+        socket.on('send-private-message', (payload) => {
+            const {socketId,receiverUserId, message} = JSON.parse(payload)
+
+            const user = userRepository.getByIdOrThrow(socket.data.userId)
+
+            const messageToCreate = {
+                userId: user.id,
+                name: user.name,
+                message: message,
+                createdAt: Date.now(),
+                receiverUserId: receiverUserId
+            }
+
+            privateMessageRepository.create(messageToCreate)
+
+            const allUsers = getAllUsers(io)
+            const isOnlineUser = socketId && !!allUsers.filter(user => user.socketId && user.socketId === socketId)?.[0]
+
+            if (isOnlineUser) {
+                socket.to(socketId).emit('receive-private-message', JSON.stringify(messageToCreate))
+            }
+
+            socket.emit('receive-private-message', JSON.stringify(messageToCreate))
+        })
+
+        socket.on('list-private-messages', (receiverUserId) => {
+            const messages = privateMessageRepository.listMessages(socket.data.userId, receiverUserId).concat(privateMessageRepository.listMessages(receiverUserId, socket.data.userId))
+
+            socket.emit('list-private-messages', JSON.stringify(messages))
         })
     })
 }

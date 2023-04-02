@@ -9,10 +9,10 @@ export const Dashboard = () => {
     const [messages, setMessages] = useState<any>([])
 
     useEffect(() => {
-        socket.emit('list-dashboard-message')
+        socket.emit('list-dashboard-messages')
 
-        socket.on('list-dashboard-message', (data) => {
-            setMessages((JSON.parse(data)))
+        socket.on('list-dashboard-messages', (data) => {
+            setMessages((JSON.parse(data).sort((a:any, b: any) => a.createdAt - b.createdAt)))
         })
 
         socket.on('receive-dashboard-message', (data) => {

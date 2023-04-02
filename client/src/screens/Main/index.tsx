@@ -4,6 +4,8 @@ import {Sidebar} from "../../components/Sidebar";
 import {SocketContextProvider, useSocket} from "../../providers/SocketContext";
 import {ChatDataContextProvider} from "../../providers/ChatDataContext";
 import {Dashboard} from "./Dashboard";
+import {Room} from "./Room";
+import {User} from "./User";
 
 export const Main = () => {
 
@@ -29,9 +31,9 @@ export const Main = () => {
                     <Sidebar/>
                     <Routes>
                         <Route path="/dashboard" element={<Dashboard/>}/>
-                        <Route path="/room/:roomId" element={<div>Room</div>}/>
-                        <Route path="/user/:userId" element={<div>User</div>}/>
-                        <Route path={"*"} element={<div>Dashboard</div>}/>
+                        <Route path="/room/:roomId" element={<Room/>}/>
+                        <Route path="/user/:userId" element={<User/>}/>
+                        <Route path={"*"} element={<Dashboard/>}/>
                     </Routes>
                 </div>
             </ChatDataContextProvider>
