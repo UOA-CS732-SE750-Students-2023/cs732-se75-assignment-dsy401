@@ -39,6 +39,10 @@ export const ChatDataContextProvider = ({ children }: any) => {
             setAllUsers(JSON.parse(users))
         })
 
+        socket.on('connect_error', (error) => {
+            localStorage.removeItem('token')
+            window.location.href = '/login'
+        })
     }, [])
 
     return (

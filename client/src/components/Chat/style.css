@@ -1,0 +1,29 @@
+.send-chat-input {
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: 1px solid black;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: black;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 65vw;
+    display: inline-block;
+}
+
+.send-chat-button{
+    margin-left: 10px;
+    padding: 12px 20px;
+}
+
+.chat-board {
+    height: 70%;
+    width: 100%;
+    overflow: auto;
+    border: 1px solid #282c34;
+}
+
+.chat-item{
+    padding: 10px;
+    margin-bottom: 10px;
+}

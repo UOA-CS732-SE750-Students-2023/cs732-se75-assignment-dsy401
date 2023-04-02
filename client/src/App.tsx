@@ -3,7 +3,6 @@ import './App.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import {Login} from "./screens/Login";
 import {Main} from "./screens/Main";
-import {NotFound} from "./screens/NotFound";
 
 const App = () => {
   return (

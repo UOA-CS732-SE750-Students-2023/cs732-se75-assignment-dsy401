@@ -3,10 +3,14 @@ import {TokenService} from "../service/token.service";
 import {RoomRepository} from "../repository/room.repository";
 import {UserRepository} from "../repository/user.repository";
 import {omit} from "lodash";
+import {DashboardMessageRepository} from "../repository/dashboard-message.repository";
+import {RoomMessageRepository} from "../repository/room-message.repository";
 
 const tokenService = new TokenService()
 const roomRepository = new RoomRepository()
 const userRepository = new UserRepository()
+const dashboardMessageRepository = new DashboardMessageRepository()
+const roomMessageRepository = new RoomMessageRepository()
 
 const getAllUsers = (io: SocketServer) => {
     const users: any[] = []
@@ -68,12 +72,45 @@ export const registerSockets = (io: SocketServer) => {
         })
 
 
-        socket.on('room-message', (payload) => {
+        socket.on('send-room-message', (payload) => {
             const {roomId, message} = JSON.parse(payload)
 
             if (!socket.rooms.has(roomId)) return;
 
-            io.in(roomId).emit('room-message', message)
+            const user = userRepository.getByIdOrThrow(socket.data.userId)
+
+            const messageToCreate = {
+                message,
+                userId: user.id,
+                name: user.name,
+                createdAt: Date.now(),
+                roomId: roomId
+            }
+
+            roomMessageRepository.create(messageToCreate)
+
+            io.in(roomId).emit('receive-room-message', roomMessageRepository)
+        })
+
+        socket.on('send-dashboard-message', (message) => {
+            const user = userRepository.getByIdOrThrow(socket.data.userId)
+
+            const messageToCreate = {
+                message,
+                userId: user.id,
+                name: user.name,
+                createdAt: Date.now(),
+            }
+
+            dashboardMessageRepository.create(messageToCreate)
+
+            io.emit('receive-dashboard-message', JSON.stringify(messageToCreate))
+        })
+
+        socket.on('list-dashboard-message', () => {
+            const messages = dashboardMessageRepository.listMessages()
+
+            socket.emit('list-dashboard-message', JSON.stringify(messages))
         })
     })
 }

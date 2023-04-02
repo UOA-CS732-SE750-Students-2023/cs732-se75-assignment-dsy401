@@ -5,9 +5,13 @@ const token_service_1 = require("../service/token.service");
 const room_repository_1 = require("../repository/room.repository");
 const user_repository_1 = require("../repository/user.repository");
 const lodash_1 = require("lodash");
+const dashboard_message_repository_1 = require("../repository/dashboard-message.repository");
+const room_message_repository_1 = require("../repository/room-message.repository");
 const tokenService = new token_service_1.TokenService();
 const roomRepository = new room_repository_1.RoomRepository();
 const userRepository = new user_repository_1.UserRepository();
+const dashboardMessageRepository = new dashboard_message_repository_1.DashboardMessageRepository();
+const roomMessageRepository = new room_message_repository_1.RoomMessageRepository();
 const getAllUsers = (io) => {
     const users = [];
     const usersFromDb = userRepository.listAllUsers();
@@ -54,11 +58,35 @@ const registerSockets = (io) => {
         socket.on('disconnect', () => {
             io.emit('all-users', JSON.stringify(getAllUsers(io)));
         });
-        socket.on('room-message', (payload) => {
+        socket.on('send-room-message', (payload) => {
             const { roomId, message } = JSON.parse(payload);
             if (!socket.rooms.has(roomId))
                 return;
-            io.in(roomId).emit('room-message', message);
+            const user = userRepository.getByIdOrThrow(socket.data.userId);
+            const messageToCreate = {
+                message,
+                userId: user.id,
+                name: user.name,
+                createdAt: Date.now(),
+                roomId: roomId
+            };
+            roomMessageRepository.create(messageToCreate);
+            io.in(roomId).emit('receive-room-message', roomMessageRepository);
+        });
+        socket.on('send-dashboard-message', (message) => {
+            const user = userRepository.getByIdOrThrow(socket.data.userId);
+            const messageToCreate = {
+                message,
+                userId: user.id,
+                name: user.name,
+                createdAt: Date.now(),
+            };
+            dashboardMessageRepository.create(messageToCreate);
+            io.emit('receive-dashboard-message', JSON.stringify(messageToCreate));
+        });
+        socket.on('list-dashboard-message', () => {
+            const messages = dashboardMessageRepository.listMessages();
+            socket.emit('list-dashboard-message', JSON.stringify(messages));
         });
     });
 };
