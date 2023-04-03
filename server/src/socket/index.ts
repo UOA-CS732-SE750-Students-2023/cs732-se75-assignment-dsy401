@@ -120,7 +120,7 @@ export const registerSockets = (io: SocketServer) => {
         socket.on('list-dashboard-messages', () => {
             const messages = dashboardMessageRepository.listMessages()
 
-            socket.emit('list-dashboard-message', JSON.stringify(messages))
+            socket.emit('list-dashboard-messages', JSON.stringify(messages))
         })
 
         socket.on('send-private-message', (payload) => {
