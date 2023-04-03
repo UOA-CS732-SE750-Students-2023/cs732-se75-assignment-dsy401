@@ -39,14 +39,22 @@ export const Chat = ({messages, sendMessage}: any) => {
         setTextMessage("")
     }
 
+    const onSubmit = (e: any) => {
+        e.preventDefault()
+
+        onSendMessage()
+    }
+
     return (
         <div style={{height: '90%'}}>
             <div ref={ref} className='chat-board'>
                 {messages.map((item: any, i:any) => <ChatItem key={i.toString()} item={item}/>)}
             </div>
             <div style={{marginTop: 20}}>
-                <div style={{display: 'inline-block'}}><input value={textMessage} onChange={(e) => setTextMessage(e.target.value)} placeholder='Enter your message ...' className='send-chat-input'/></div>
-                <div style={{display: 'inline-block'}}><button onClick={onSendMessage} className='send-chat-button'>Send Message</button></div>
+                <form onSubmit={onSubmit}>
+                    <div style={{display: 'inline-block'}}><input value={textMessage} onChange={(e) => setTextMessage(e.target.value)} placeholder='Enter your message ...' className='send-chat-input'/></div>
+                    <div style={{display: 'inline-block'}}><button type={'submit'} className='send-chat-button'>Send Message</button></div>
+                </form>
             </div>
         </div>
     )
