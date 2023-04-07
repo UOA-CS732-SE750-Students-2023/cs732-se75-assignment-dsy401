@@ -52,7 +52,7 @@ If you meet more issues to run the apps, please contact me
 
 ### How to Sign In
 Since the app is real time live chatting app with sign in functionality, we will ask the sign in credential to sign in to the app:
-![](../../../../var/folders/h_/00zmt9nd7vx433rsxq8c4jr40000gn/T/TemporaryItems/NSIRD_screencaptureui_1kl4Yn/Screen Shot 2023-04-07 at 11.43.13 AM.png)
+![Screen Shot 2023-04-07 at 12 17 48 PM](https://user-images.githubusercontent.com/40448549/230515900-b740122b-887e-43bc-be37-d2edf1bf0ad8.png)
 
 For the demo purpose, I created four in-built users that can be signed in:
 - <a>Shunyuan Deng<a/> (email: <a>sden406@aucklanduni.ac.nz<a/> password: <a>123456<a/>)
@@ -77,8 +77,8 @@ You can use one of those users above to sign in to the app.
 #### How to test the real time chat?
 - Open a Browser to sign in as any users in the user lists above (eg. <a>reviewer@aucklanduni.ac.nz</a>)
 - Open an incognito Browser to sign in as any users except the user login above (eg. <a>guest@aucklanduni.ac.nz</a>)
-![](../../../../var/folders/h_/00zmt9nd7vx433rsxq8c4jr40000gn/T/TemporaryItems/NSIRD_screencaptureui_PMuI9e/Screen Shot 2023-04-07 at 12.10.41 PM.png)
-![](../../../../var/folders/h_/00zmt9nd7vx433rsxq8c4jr40000gn/T/TemporaryItems/NSIRD_screencaptureui_EdOOPd/Screen Shot 2023-04-07 at 12.12.20 PM.png)
+![Screen Shot 2023-04-07 at 12 19 02 PM](https://user-images.githubusercontent.com/40448549/230516006-30a0f727-5850-48a9-a09c-d4f01482c946.png)
+Then you could try to send some (All in real time!)
 
 #### Note
  - If you restart the server, all the messages will be gone since I use the in-memory data storage.
