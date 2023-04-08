@@ -24,7 +24,7 @@ $ npm install
 $ npm start
 ```
 
-####To start Backend:
+#### To start Backend:
 ```bash
 # navigate to Backend app folder
 $ cd server
