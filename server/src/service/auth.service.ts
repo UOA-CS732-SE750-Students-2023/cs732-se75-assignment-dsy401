@@ -21,7 +21,7 @@ export class AuthService {
         const accessToken = this.tokenService.create({
             userId: user.id,
         },
-            86164 // TODO: config
+            86164
             )
 
         return {

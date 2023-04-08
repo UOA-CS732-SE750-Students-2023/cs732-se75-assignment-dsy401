@@ -6,7 +6,7 @@ import {registerSockets} from "./src/socket";
 import bodyParser from "body-parser";
 import cors from 'cors'
 
-const port = 8080 // TODO: config
+const port = 8080
 
 const expressServer: Express = express()
 const httpServer = createServer(expressServer)

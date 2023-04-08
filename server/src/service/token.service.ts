@@ -1,7 +1,7 @@
 import { JwtPayload, sign, verify } from 'jsonwebtoken';
 
 export class TokenService {
-    private readonly tokenSecret = 'asdnasdhadlhasld' // TODO: config
+    private readonly tokenSecret = 'asdnasdhadlhasld'
 
     public create<T>(data: T, ttl: number): string {
         const exp = Math.floor(Date.now() / 1000) + ttl;
