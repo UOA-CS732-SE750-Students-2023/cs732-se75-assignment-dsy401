@@ -10,9 +10,9 @@
 
 #### Node Version: 16.14.2
 
-####You need to open two terminals to run both Frontend and Backend applications
+#### You need to open two terminals to run both Frontend and Backend applications
 
-####To start Frontend:
+#### To start Frontend:
 ```bash
 # navigate to Frontend app folder
 $ cd client
