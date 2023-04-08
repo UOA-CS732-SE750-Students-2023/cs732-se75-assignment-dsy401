@@ -43,6 +43,13 @@ $ npm run start
 It might be related to the node runtime version which is not compatible to the dependencies.
 You could try to use `nvm` to switch the node runtime version [NVM Install Guide](https://www.freecodecamp.org/news/node-version-manager-nvm-install-guide/)
 
+#### Issues running `npm start`
+if you meet error below
+```bash
+Error: listen EADDRINUSE: address already in use :::8080
+```
+Please `npx kill-port 8080` then `npm start` again
+
 ### More Issues running the apps
 If you meet more issues to run the apps, please contact me
 - student email: <a>sden406@aucklanduni.ac.nz</a>
