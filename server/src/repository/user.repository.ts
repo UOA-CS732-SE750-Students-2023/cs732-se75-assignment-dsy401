@@ -35,6 +35,9 @@ const users: User[] = [
     }
 ]
 
+/**
+ * User repository to get data from users
+ */
 export class UserRepository {
     public getByEmail(email: string): User | null {
         return users.find((user: User) => user.email === email) ?? null

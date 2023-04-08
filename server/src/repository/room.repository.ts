@@ -18,6 +18,9 @@ const rooms: Room[] = [
     }
 ]
 
+/**
+ * Room repository to get room data
+ */
 export class RoomRepository {
     public listRooms(): Room[] {
         return rooms

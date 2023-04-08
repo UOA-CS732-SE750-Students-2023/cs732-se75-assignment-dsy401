@@ -6,6 +6,9 @@ type PrivateMessage = Message & {
 
 const messages: PrivateMessage[] = []
 
+/**
+ * Private message repository to get private messages
+ */
 export class PrivateMessageRepository {
     public create(message: PrivateMessage): void {
         messages.push(message)

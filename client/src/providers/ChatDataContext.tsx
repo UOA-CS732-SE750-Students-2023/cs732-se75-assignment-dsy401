@@ -17,7 +17,9 @@ export const ChatDataContextProvider = ({ children }: any) => {
     const [allUsers, setAllUsers] = useState([])
 
     useEffect(() => {
+        // connect to socket server
         socket.connect()
+
         socket.on('connect', () => {
             setHasSocketConnected(true)
         })
@@ -27,18 +29,22 @@ export const ChatDataContextProvider = ({ children }: any) => {
         })
 
 
+        // subscribe all-active-rooms event
         socket.on('all-active-rooms', (rooms) => {
             setRooms(JSON.parse(rooms))
         })
 
+        // subscribe current-user event
         socket.on('current-user', (user) => {
             setCurrentUser(JSON.parse(user))
         })
 
+        // subscribe all-users event
         socket.on('all-users', (users) => {
             setAllUsers(JSON.parse(users))
         })
 
+        // subscribe connection error event
         socket.on('connect_error', (error) => {
             localStorage.removeItem('token')
             window.location.href = '/login'

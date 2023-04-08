@@ -14,6 +14,7 @@ const dashboardMessageRepository = new DashboardMessageRepository()
 const roomMessageRepository = new RoomMessageRepository()
 const privateMessageRepository = new PrivateMessageRepository()
 
+// get all users to be sent to client
 const getAllUsers = (io: SocketServer) => {
     const users: any[] = []
     const usersFromDb = userRepository.listAllUsers()
@@ -41,12 +42,15 @@ const getAllUsers = (io: SocketServer) => {
 
 export const registerSockets = (io: SocketServer) => {
 
+    // socket middleware to validate the token before connection
     io.use((socket, next) => {
         const token = socket.handshake.auth.token
 
         try {
+            // verify token
             const {userId} = tokenService.verify<{userId: string}>(token)
 
+            // check the whether user in database
             const {name} = userRepository.getByIdOrThrow(userId)
 
             socket.data = {
@@ -60,20 +64,24 @@ export const registerSockets = (io: SocketServer) => {
         }
     })
 
+    // client has connected to server
     io.on('connection', (socket)=> {
         console.log(`user ${socket.data.userId} is connected`)
 
+        // once connection successfully, emit current-user, all-users, all-active-rooms events and join rooms
         socket.emit('current-user', JSON.stringify(omit(userRepository.getById(socket.data.userId), ['password'])))
         io.emit('all-users', JSON.stringify(getAllUsers(io)))
         io.emit('all-active-rooms', JSON.stringify(roomRepository.listRooms()))
         socket.join(roomRepository.listRooms().map(room => room.id))
 
 
+        // socket disconnection handler
         socket.on('disconnect', () => {
             io.emit('all-users', JSON.stringify(getAllUsers(io)))
         })
 
 
+        // receive the send-room-message
         socket.on('send-room-message', (payload) => {
             const {roomId, message} = JSON.parse(payload)
 
@@ -91,9 +99,11 @@ export const registerSockets = (io: SocketServer) => {
 
             roomMessageRepository.create(messageToCreate)
 
+            // send the message in room
             io.in(roomId).emit('receive-room-message', JSON.stringify(messageToCreate))
         })
 
+        // list room messages by room id
         socket.on('list-room-messages', (roomId) => {
             if (!socket.rooms.has(roomId)) return;
 
@@ -102,6 +112,7 @@ export const registerSockets = (io: SocketServer) => {
             socket.emit('list-room-messages', JSON.stringify(messages))
         })
 
+        // receive the send-dashboard-message
         socket.on('send-dashboard-message', (message) => {
             const user = userRepository.getByIdOrThrow(socket.data.userId)
 
@@ -114,15 +125,18 @@ export const registerSockets = (io: SocketServer) => {
 
             dashboardMessageRepository.create(messageToCreate)
 
+            // send message to all the users
             io.emit('receive-dashboard-message', JSON.stringify(messageToCreate))
         })
 
+        // list all the dashboard messages
         socket.on('list-dashboard-messages', () => {
             const messages = dashboardMessageRepository.listMessages()
 
             socket.emit('list-dashboard-messages', JSON.stringify(messages))
         })
 
+        // receive send private message event
         socket.on('send-private-message', (payload) => {
             const {socketId,receiverUserId, message} = JSON.parse(payload)
 
@@ -145,9 +159,11 @@ export const registerSockets = (io: SocketServer) => {
                 socket.to(socketId).emit('receive-private-message', JSON.stringify(messageToCreate))
             }
 
+            // send private message to the specific socket
             socket.emit('receive-private-message', JSON.stringify(messageToCreate))
         })
 
+        // list all private messages based on socket id
         socket.on('list-private-messages', (receiverUserId) => {
             const messages = privateMessageRepository.listMessages(socket.data.userId, receiverUserId).concat(privateMessageRepository.listMessages(receiverUserId, socket.data.userId))
 

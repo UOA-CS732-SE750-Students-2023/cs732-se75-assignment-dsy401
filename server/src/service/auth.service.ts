@@ -10,6 +10,7 @@ export class AuthService {
     }
 
 
+    // sign in and return a token and user id
     public signIn(email: string, password: string) {
         const user = this.userRepository.getByEmailOrThrow(email)
 
@@ -21,7 +22,7 @@ export class AuthService {
         const accessToken = this.tokenService.create({
             userId: user.id,
         },
-            86164
+            86164 // token ttl
             )
 
         return {

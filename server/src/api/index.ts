@@ -6,6 +6,7 @@ export const registerApis = (app: Express): void => {
 
     const authService = new AuthService()
 
+    // Sign in reset endpoint
     router.post('/sign-in', (req, res) => {
         const {email, password} = req.body
 

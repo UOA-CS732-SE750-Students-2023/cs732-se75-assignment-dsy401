@@ -7,6 +7,9 @@ type RoomMessage = Message & {
 
 const messages: RoomMessage[] = []
 
+/**
+ * Room message repository to get room data
+ */
 export class RoomMessageRepository {
     public create(message: RoomMessage): void {
         messages.push(message)
