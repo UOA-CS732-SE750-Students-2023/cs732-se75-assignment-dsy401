@@ -8,6 +8,8 @@
 
 ## Running the app
 
+#### You will be required to install NODE to run both frontend and backend application
+
 #### Node Version: 16.14.2
 
 #### You need to open two terminals to run both Frontend and Backend applications
