@@ -53,7 +53,7 @@ Please `npx kill-port 8080` then `npm start` again
 ### More Issues running the apps
 If you meet more issues to run the apps, please contact me
 - student email: <a>sden406@aucklanduni.ac.nz</a>
-- personal email: <a>sden406@aucklanduni.ac.nz</a>
+- personal email: <a>oliverdeng1020@gmail.com</a>
 
 ## App Instructions
 
